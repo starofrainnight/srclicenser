@@ -14,7 +14,7 @@ from contextlib import contextmanager
 from click.testing import CliRunner
 
 from srclicenser import srclicenser
-from srclicenser import cli
+from srclicenser.__main__ import main
 
 
 @pytest.fixture
@@ -33,10 +33,7 @@ def test_content(response):
     # assert 'GitHub' in BeautifulSoup(response.content).title.string
 def test_command_line_interface():
     runner = CliRunner()
-    result = runner.invoke(cli.main)
-    assert result.exit_code == 0
-    assert 'srclicenser.__main__.main' in result.output
-    help_result = runner.invoke(cli.main, ['--help'])
+    result = runner.invoke(main)
+    assert result.exit_code == 2
+    help_result = runner.invoke(main, ['--help'])
     assert help_result.exit_code == 0
-    assert '--help  Show this message and exit.' in help_result.output
-
