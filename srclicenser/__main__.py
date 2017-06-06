@@ -30,7 +30,7 @@ def main(target, license, style):
     """
     Program that replace license inside source files.
 
-    TARGET: The specific directory or source file needs to be parse
+    TARGET: The specific source file needs to be parse
     """
 
     comment_marks = {
