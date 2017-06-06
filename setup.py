@@ -18,7 +18,8 @@ test_requirements = [
 setup(
     name='srclicenser',
     version='0.1.0',
-    description="A tool that make sure there have a license header at top of source files",
+    description="A tool that make sure there have a license header at top of "
+                "source files",
     long_description=long_description,
     author="Hong-She Liang",
     author_email='starofrainnight@gmail.com',

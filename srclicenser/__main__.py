@@ -6,6 +6,7 @@ import pathlib
 import chardet
 import logging
 
+
 def load_file(file_path):
     with open(file_path, "rb") as f:
         content = f.read()
@@ -20,12 +21,13 @@ def load_file(file_path):
 
     return (lines, charset)
 
+
 @click.command()
 @click.argument('target')
 @click.option('--license', default=None,
-    help='The license file we want to insert.')
+              help='The license file we want to insert.')
 @click.option('--style', default="cpp",
-    help='Which comment style apply to sources, defult to "cpp"')
+              help='Which comment style apply to sources, defult to "cpp"')
 def main(target, license, style):
     """
     Program that replace license inside source files.
@@ -34,10 +36,10 @@ def main(target, license, style):
     """
 
     comment_marks = {
-        "c":["\n/* %s\n *", " * %s", " *\n * %s */\n"],
-        "cpp":["\n// %s\n//", "// %s", "//\n// %s\n"],
-        "sh":["\n# %s\n#", "# %s", "#\n# %s\n"],
-        "python":['"""%s\n', "%s", "\n%s\n"],
+        "c": ["\n/* %s\n *", " * %s", " *\n * %s */\n"],
+        "cpp": ["\n// %s\n//", "// %s", "//\n// %s\n"],
+        "sh": ["\n# %s\n#", "# %s", "#\n# %s\n"],
+        "python": ['"""%s\n', "%s", "\n%s\n"],
     }
 
     comment_mark = comment_marks[style]
@@ -78,9 +80,9 @@ def main(target, license, style):
         tail_index = insert_begin_index
     else:
         tail_index = (source_license_begin +
-         len(license_lines) +
-         len(comment_mark[0].splitlines()) +
-         len(comment_mark[2].splitlines()))
+                      len(license_lines) +
+                      len(comment_mark[0].splitlines()) +
+                      len(comment_mark[2].splitlines()))
 
     # Strip down the first empty lines on tail
     for i in range(tail_index, len(source_lines)):
@@ -101,11 +103,14 @@ def main(target, license, style):
 
     generated_license.append(comment_mark[2] % end_mark)
 
-    generated_source_lines = generated_source_head_lines + generated_license + generated_source_tail_lines
+    generated_source_lines = (generated_source_head_lines +
+                              generated_license +
+                              generated_source_tail_lines)
 
     # Output generated file with original encodings
     with open(source_file_path, "wb") as f:
-        f.write("\n".join(generated_source_lines).encode(source_charset["encoding"]))
+        f.write("\n".join(generated_source_lines)
+                .encode(source_charset["encoding"]))
 
     return 0
 

@@ -10,10 +10,7 @@ Tests for `srclicenser` module.
 
 import pytest
 
-from contextlib import contextmanager
 from click.testing import CliRunner
-
-from srclicenser import srclicenser
 from srclicenser.__main__ import main
 
 
@@ -31,6 +28,8 @@ def test_content(response):
     """
     # from bs4 import BeautifulSoup
     # assert 'GitHub' in BeautifulSoup(response.content).title.string
+
+
 def test_command_line_interface():
     runner = CliRunner()
     result = runner.invoke(main)
