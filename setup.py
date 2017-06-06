@@ -8,7 +8,7 @@ with open('README.rst') as readme_file, open('HISTORY.rst') as history_file:
 
 requirements = [
     'Click>=6.0',
-    'chartdet',
+    'chardet',
 ]
 
 test_requirements = [
