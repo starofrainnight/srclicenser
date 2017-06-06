@@ -24,7 +24,9 @@ def load_file(file_path):
 @click.argument('target')
 @click.option('--license', default=None,
     help='The license file we want to insert.')
-def main(target, license):
+@click.option('--style', default="cpp",
+    help='Which comment style apply to sources, defult to "cpp"')
+def main(target, license, style):
     """
     Program that replace license inside source files.
 
@@ -38,7 +40,7 @@ def main(target, license):
         "python":['"""%s\n', "%s", "\n%s\n"],
     }
 
-    comment_mark = comment_marks['cpp']
+    comment_mark = comment_marks[style]
 
     begin_mark = "LICENSE_BEGIN"
     end_mark = "LICENSE_END"
