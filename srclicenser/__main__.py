@@ -28,29 +28,37 @@ def load_file(file_path):
 
 @click.command()
 @click.argument('target')
-@click.option('--license', default=None,
+@click.option('-t', '--to-license', default=None,
               help='The license file we want to insert.')
+@click.option('-f', '--from-license', default=None,
+              help='The original license file we want to replace.')
 @click.option('--style', default="cpp",
-              help='Which comment style apply to sources, defult to "cpp"')
-def main(target, license, style):
+              help='Which comment style apply to sources, default to "cpp"')
+def main(target, from_license, to_license, style):
     """
     Program that replace license inside source files.
 
     TARGET: The specific source file needs to be parse
     """
 
-    if license is None:
-        license_file_path = "LICENSE"
+    if to_license is None:
+        to_license_path = "LICENSE"
     else:
-        license_file_path = license
+        to_license_path = license
 
-    if not pathlib.Path(license_file_path).exists():
-        logging.error("License file \"%s\" not found!" % license_file_path)
+    if from_license is None:
+        from_license_path = "LICENSE"
+    else:
+        from_license_path = license
+
+    if not pathlib.Path(to_license_path).exists():
+        logging.error("License file \"%s\" not found!" % to_license_path)
         return -1
 
     source_file_path = target
 
-    license_lines, license_charset = load_file(license_file_path)
+    from_license_lines, from_license_charset = load_file(from_license_path)
+    to_license_lines, to_license_charset = load_file(to_license_path)
     source_lines, source_charset = load_file(source_file_path)
 
     if len(source_lines) <= 0:
@@ -59,7 +67,7 @@ def main(target, license, style):
         return 0
 
     licenser = licensers.create_licenser(
-        style, source_lines, license_lines, license_lines)
+        style, source_lines, from_license_lines, to_license_lines)
 
     parsed_source_lines = licenser.parse()
 
