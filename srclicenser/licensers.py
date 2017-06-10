@@ -71,7 +71,7 @@ class Licenser(object):
                     break
             else:
                 if not line.startswith(comment_mark[0]):
-                    end_index = index + 1
+                    end_index = index
                     break
 
             index += 1
@@ -87,12 +87,10 @@ class Licenser(object):
         '''
 
         out_license = []
-        out_license.append("")
         out_license.append(self.wrapper_marks[0])
         for line in license:
             out_license.append(self.wrapper_marks[1] % line)
         out_license.append(self.wrapper_marks[2])
-        out_license.append("")
 
         return out_license
 
@@ -155,10 +153,19 @@ class Licenser(object):
         if block is None:
             block = self._find_next_block(next_search_index)
             if (block is not None) and (block[0] <= next_search_index):
-                next_search_index = block[1] - 1
+                next_search_index = block[1]
 
-            parsed_source[next_search_index:next_search_index] = (
-                self._styled_license(self._to_license))
+            styled_license = self._styled_license(self._to_license)
+            parsed_source[next_search_index:next_search_index] = [""]
+            next_search_index += 1
+            parsed_source[next_search_index:next_search_index] = styled_license
+            next_search_index += len(styled_license)
+            parsed_source[next_search_index:next_search_index] = [""]
+        elif self._from_license == self._to_license:
+            # Though we found license, but the from license and to license is
+            # the same, that means there already have the license we want to
+            # insert!
+            return None
         else:
             parsed_source[block[0]:block[1]] = (
                 self._styled_license(self._to_license))
