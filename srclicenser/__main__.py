@@ -5,6 +5,8 @@ import click
 import pathlib
 import chardet
 import logging
+import shutil
+from .import licensers
 
 
 def load_file(file_path):
@@ -16,8 +18,10 @@ def load_file(file_path):
     if charset["encoding"] == "gb2312":
         charset["encoding"] = "gbk"
 
-    content = content.decode(charset["encoding"])
-    lines = content.splitlines()
+    lines = []
+    if charset["encoding"] is not None:
+        content = content.decode(charset["encoding"])
+        lines = content.splitlines()
 
     return (lines, charset)
 
@@ -35,18 +39,6 @@ def main(target, license, style):
     TARGET: The specific source file needs to be parse
     """
 
-    comment_marks = {
-        "c": ["\n/* %s\n *", " * %s", " *\n * %s */\n"],
-        "cpp": ["\n// %s\n//", "// %s", "//\n// %s\n"],
-        "sh": ["\n# %s\n#", "# %s", "#\n# %s\n"],
-        "python": ['"""%s\n', "%s", "\n%s\n"],
-    }
-
-    comment_mark = comment_marks[style]
-
-    begin_mark = "LICENSE_BEGIN"
-    end_mark = "LICENSE_END"
-
     if license is None:
         license_file_path = "LICENSE"
     else:
@@ -61,56 +53,32 @@ def main(target, license, style):
     license_lines, license_charset = load_file(license_file_path)
     source_lines, source_charset = load_file(source_file_path)
 
-    insert_begin_index = 0
-    if source_lines[0].startswith(r"#!"):
-        insert_begin_index = 1
+    if len(source_lines) <= 0:
+        logging.warn(
+            "Source file does not have any content : \"%s\" !" % source_file_path)
+        return 0
 
-    generated_source_head_lines = source_lines[0:insert_begin_index]
+    licenser = licensers.create_licenser(
+        style, source_lines, license_lines, license_lines)
 
-    # Normally the license won't start at line more than 5 lines.
-    # We search the begin line index
-    source_license_begin = -1
-    for i in range(insert_begin_index, min(5, len(source_lines))):
-        if begin_mark in source_lines[i]:
-            source_license_begin = i
-            break
+    parsed_source_lines = licenser.parse()
 
-    # This source don't have any license, we just insert the license
-    if source_license_begin < 0:
-        tail_index = insert_begin_index
-    else:
-        tail_index = (source_license_begin +
-                      len(license_lines) +
-                      len(comment_mark[0].splitlines()) +
-                      len(comment_mark[2].splitlines()))
+    if parsed_source_lines is not None:
+        # Output generated file with original encodings
 
-    # Strip down the first empty lines on tail
-    for i in range(tail_index, len(source_lines)):
-        if len(source_lines[i].strip()) <= 0:
-            continue
+        parsed_source_content = "\n".join(parsed_source_lines)
 
-        break
+        # Before write to specific file, we backup it first
+        shutil.copyfile(source_file_path, "%s.bak" % source_file_path)
 
-    generated_source_tail_lines = source_lines[i:]
-
-    # Parse the license lines to fit for the source file format
-    generated_license = [
-        comment_mark[0] % begin_mark
-    ]
-
-    for aline in license_lines:
-        generated_license.append(comment_mark[1] % aline)
-
-    generated_license.append(comment_mark[2] % end_mark)
-
-    generated_source_lines = (generated_source_head_lines +
-                              generated_license +
-                              generated_source_tail_lines)
-
-    # Output generated file with original encodings
-    with open(source_file_path, "wb") as f:
-        f.write("\n".join(generated_source_lines)
-                .encode(source_charset["encoding"]))
+        try:
+            with open(source_file_path, "wb") as f:
+                f.write(parsed_source_content.encode(
+                    source_charset["encoding"]))
+        except:
+            # If any exception happened, we restore old backup
+            shutil.copyfile("%s.bak" % source_file_path, source_file_path)
+            raise
 
     return 0
 
