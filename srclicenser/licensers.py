@@ -29,7 +29,8 @@ class Licenser(object):
         @return The line index after header block
         '''
 
-        if (len(self._source) > 0) and (self._source[0].strip().startswith("#!")):
+        if ((len(self._source) > 0)
+                and (self._source[0].strip().startswith("#!"))):
             return 1
 
         return 0
