@@ -42,23 +42,19 @@ def main(target, from_license, to_license, style):
     """
 
     if to_license is None:
-        to_license_path = "LICENSE"
-    else:
-        to_license_path = license
+        to_license = "LICENSE"
 
     if from_license is None:
-        from_license_path = "LICENSE"
-    else:
-        from_license_path = license
+        from_license = "LICENSE"
 
-    if not pathlib.Path(to_license_path).exists():
-        logging.error("License file \"%s\" not found!" % to_license_path)
+    if not pathlib.Path(to_license).exists():
+        logging.error("License file \"%s\" not found!" % to_license)
         return -1
 
     source_file_path = target
 
-    from_license_lines, from_license_charset = load_file(from_license_path)
-    to_license_lines, to_license_charset = load_file(to_license_path)
+    from_license_lines, from_license_charset = load_file(from_license)
+    to_license_lines, to_license_charset = load_file(to_license)
     source_lines, source_charset = load_file(source_file_path)
 
     if len(source_lines) <= 0:
