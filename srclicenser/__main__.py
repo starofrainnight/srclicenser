@@ -3,13 +3,13 @@
 
 #
 # Copyright 2017, Hong-She Liang <starofrainnight@gmail.com>.  All rights reserved.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -87,8 +87,13 @@ def main(target, from_license, to_license, style):
     parsed_source_lines = licenser.parse()
 
     if parsed_source_lines is not None:
-        # Output generated file with original encodings
+        # Check if there have empty at last line, append one if there does not
+        # have one.
+        if len(parsed_source_lines) > 0:
+            if len(parsed_source_lines[len(parsed_source_lines) - 1]) > 0:
+                parsed_source_lines.append("")
 
+        # Output generated file with original encodings
         parsed_source_content = "\n".join(parsed_source_lines)
 
         # Before write to specific file, we backup it first
