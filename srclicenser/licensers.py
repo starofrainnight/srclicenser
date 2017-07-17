@@ -110,7 +110,8 @@ class Licenser(object):
         out_license = []
         out_license.append(self.wrapper_marks[0])
         for line in license:
-            out_license.append(self.wrapper_marks[1] % line)
+            line = self.wrapper_marks[1] % line
+            out_license.append(line.strip())
         out_license.append(self.wrapper_marks[2])
 
         return out_license
