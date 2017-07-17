@@ -33,7 +33,9 @@ def load_file(file_path):
 @click.option('-f', '--from-license', default=None,
               help='The original license file we want to replace.')
 @click.option('--style', default="cpp",
-              help='Which comment style apply to sources, default to "cpp"')
+              help=('Which comment style apply to sources, default to "cpp".'
+                    ' Supported styles : %s' % ', '.join(
+                        licensers.get_licenser_classes().keys())))
 def main(target, from_license, to_license, style):
     """
     Program that replace license inside source files.
