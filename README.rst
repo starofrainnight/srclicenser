@@ -21,7 +21,7 @@ srclicenser
 A tool that make sure there have a license header at top of source files
 
 
-* Free software: MIT
+* Free software: Apache License 2.0
 * Documentation: https://srclicenser.readthedocs.io.
 
 
